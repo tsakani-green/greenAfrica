@@ -257,7 +257,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || payload.length === 0) return null;
 
   return (
-    <div className="min-h-screen bg-lime-50 py-10 font-sans">
+    <div className="backdrop-blur-lg bg-lime-50 border border-gray-200 rounded-2xl p-4 shadow-2xl">
       <div className="flex items-center gap-2 mb-2">
         <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" />
         <p className="font-bold text-gray-900 text-sm">{label}</p>
