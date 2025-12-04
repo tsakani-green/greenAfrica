@@ -986,7 +986,7 @@ export default function Dashboard() {
         if (secondLogo) {
           try {
             const secondLogoData = secondLogo.replace(/^data:image\/\w+;base64,/, "");
-            doc.addImage(secondLogoData, "PNG", pageWidth - 46, 30, 25, 25);
+            doc.addImage(secondLogoData, "PNG", pageWidth - 49, 28, 25, 25);
           } catch (error) {
             console.warn("Failed to add second logo to PDF:", error);
           }
