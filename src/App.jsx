@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -31,7 +31,7 @@ import EthicsCompliance from "./pages/governance/EthicsCompliance";
 import DataPrivacySecurity from "./pages/governance/DataPrivacySecurity";
 import SupplyChainGovernance from "./pages/governance/SupplyChainGovernance";
 
-// Data Import / Operational View
+// Data Import
 import DataImport from "./pages/DataImport";
 
 import ErrorBoundaryWrapper from "./components/ErrorBoundaryWrapper";
@@ -39,16 +39,44 @@ import ErrorBoundaryWrapper from "./components/ErrorBoundaryWrapper";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
+  const [bootstrapped, setBootstrapped] = useState(false); // ensures no redirect loop
 
+  // ⬇ Load authentication state from localStorage on app boot
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("esgUser");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.username) {
+          setUsername(parsed.username);
+          setIsAuthenticated(true);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load saved user", err);
+    } finally {
+      setBootstrapped(true);
+    }
+  }, []);
+
+  // ⬇ Save auth state to localStorage
   const handleLogin = (name) => {
     setUsername(name);
     setIsAuthenticated(true);
+    localStorage.setItem("esgUser", JSON.stringify({ username: name }));
   };
 
+  // ⬇ Clear auth state on logout
   const handleLogout = () => {
     setUsername("");
     setIsAuthenticated(false);
+    localStorage.removeItem("esgUser");
   };
+
+  // ⬇ Avoid rendering routes until auth state is restored
+  if (!bootstrapped) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <SimulationProvider>
@@ -58,19 +86,19 @@ function App() {
         )}
 
         <Routes>
-          {/* Root / Login */}
+          {/* Login */}
           <Route
             path="/"
             element={
               isAuthenticated ? (
-                <Navigate to="/dashboard" />
+                <Navigate to="/dashboard" replace />
               ) : (
                 <Login onLogin={handleLogin} />
               )
             }
           />
 
-          {/* Dashboard Overview */}
+          {/* Dashboard */}
           <Route
             path="/dashboard"
             element={
@@ -79,12 +107,12 @@ function App() {
                   <Dashboard />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
 
-          {/* ESG AI Insights */}
+          {/* Insights */}
           <Route
             path="/dashboard/esg"
             element={
@@ -93,12 +121,12 @@ function App() {
                   <Insights />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
 
-          {/* Social main */}
+          {/* Social */}
           <Route
             path="/dashboard/social"
             element={
@@ -107,86 +135,26 @@ function App() {
                   <SocialCategory />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
 
-          {/* Social sub-pages – linked from Social dropdown */}
+          {/* Social subpages */}
           <Route
-            path="/dashboard/social/supplier"
+            path="/dashboard/social/*"
             element={
               isAuthenticated ? (
                 <ErrorBoundaryWrapper>
                   <SocialCategory />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/dashboard/social/human-capital"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <SocialCategory />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/dashboard/social/community"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <SocialCategory />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/dashboard/social/stakeholder-surveys"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <SocialCategory />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/dashboard/social/supplier-survey"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <SocialCategory />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/dashboard/social/csi"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <SocialCategory />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
 
-          {/* Governance main */}
+          {/* Governance */}
           <Route
             path="/dashboard/governance"
             element={
@@ -195,12 +163,12 @@ function App() {
                   <GovernanceCategory />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
 
-          {/* Governance sub-pages (match Navbar governanceLinks) */}
+          {/* Governance subpages */}
           <Route
             path="/dashboard/governance/corporate"
             element={
@@ -209,7 +177,7 @@ function App() {
                   <CorporateGovernance />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
@@ -221,7 +189,7 @@ function App() {
                   <EthicsCompliance />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
@@ -233,7 +201,7 @@ function App() {
                   <DataPrivacySecurity />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
@@ -245,12 +213,12 @@ function App() {
                   <SupplyChainGovernance />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
 
-          {/* Environmental landing */}
+          {/* Environmental */}
           <Route
             path="/dashboard/environment"
             element={
@@ -259,22 +227,21 @@ function App() {
                   <EnvironmentalCategory />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
 
-          {/* Environmental sub-pages */}
-          {/* IMPORTANT: this now renders EnvironmentalCategory instead of Energy */}
+          {/* Environmental subpages */}
           <Route
             path="/dashboard/environment/energy"
             element={
               isAuthenticated ? (
                 <ErrorBoundaryWrapper>
-                  <EnvironmentalCategory />
+                  <Energy />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
@@ -286,7 +253,7 @@ function App() {
                   <Carbon />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
@@ -298,7 +265,7 @@ function App() {
                   <Water />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
@@ -310,7 +277,7 @@ function App() {
                   <Waste />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
@@ -322,105 +289,19 @@ function App() {
                   <Coal />
                 </ErrorBoundaryWrapper>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
 
-          {/* Legacy / simple routes – optional */}
-          <Route
-            path="/environmental"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <EnvironmentalCategory />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/social"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <SocialCategory />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/governance"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <GovernanceCategory />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/governance/corporate"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <CorporateGovernance />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/governance/carbon"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <Carbon />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/governance/energy"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <Energy />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/governance/insights"
-            element={
-              isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <Insights />
-                </ErrorBoundaryWrapper>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-
-          {/* Catch-all */}
+          {/* FALLBACK (catch-all) */}
           <Route
             path="*"
             element={
               isAuthenticated ? (
-                <Navigate to="/dashboard" />
+                <Navigate to="/dashboard" replace />
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               )
             }
           />
