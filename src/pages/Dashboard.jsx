@@ -855,18 +855,15 @@ export default function Dashboard() {
         if (isSecondLogo) {
           setSecondLogo(data.logo);
           localStorage.setItem("secondLogo", data.logo);
-          alert("Second logo uploaded successfully!");
         } else {
           setCompanyLogo(data.logo);
           localStorage.setItem("companyLogo", data.logo);
-          alert("Logo uploaded successfully!");
         }
       } else {
-        alert(data.detail || "Failed to extract logo from file");
+        console.warn(data.detail || "Failed to extract logo from file");
       }
     } catch (error) {
       console.error("Error uploading logo:", error);
-      alert("Failed to upload logo");
     } finally {
       if (isSecondLogo) {
         setSecondLogoLoading(false);
@@ -984,7 +981,7 @@ export default function Dashboard() {
         if (secondLogo) {
           try {
             const secondLogoData = secondLogo.replace(/^data:image\/\w+;base64,/, "");
-            doc.addImage(secondLogoData, "PNG", pageWidth - 40, 25, 25, 25);
+            doc.addImage(secondLogoData, "PNG", pageWidth - 54, 10, 40, 40);
           } catch (error) {
             console.warn("Failed to add second logo to PDF:", error);
           }
@@ -1222,6 +1219,22 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-lime-50 py-10 font-sans">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Hidden file inputs for logo uploads */}
+        <div style={{ display: 'none' }}>
+          <input
+            type="file"
+            id="logo-upload"
+            accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff,.webp"
+            onChange={(e) => handleLogoUpload(e, false)}
+          />
+          <input
+            type="file"
+            id="second-logo-upload"
+            accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff,.webp"
+            onChange={(e) => handleLogoUpload(e, true)}
+          />
+        </div>
+
         {/* Header Row */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -1230,7 +1243,7 @@ export default function Dashboard() {
             </h1>
             
             {/* Company Name Display - HIDDEN */}
-            <div className="hidden">
+            <div style={{ display: 'none' }}>
               {isEditingCompany ? (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 p-3 bg-white rounded-lg border border-emerald-200 shadow-sm">
                   <div className="flex items-center gap-2">
@@ -1318,24 +1331,6 @@ export default function Dashboard() {
                 </p>
               )}
             </div>
-          </div>
-
-          {/* Hidden file inputs for logo uploads */}
-          <div className="hidden">
-            <input
-              type="file"
-              id="logo-upload"
-              accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff,.webp"
-              onChange={(e) => handleLogoUpload(e, false)}
-              className="hidden"
-            />
-            <input
-              type="file"
-              id="second-logo-upload"
-              accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff,.webp"
-              onChange={(e) => handleLogoUpload(e, true)}
-              className="hidden"
-            />
           </div>
 
           <div className="flex items-center gap-3">
@@ -1477,7 +1472,7 @@ export default function Dashboard() {
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
                 ESG Performance Overview
               </h2>
-              <div className="hidden">
+              <div style={{ display: 'none' }}>
                 <div className="text-right">
                   <div className="text-sm font-semibold text-gray-700">
                     Company: {companyName || "Company Name"}
