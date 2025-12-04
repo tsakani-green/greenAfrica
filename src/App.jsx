@@ -39,9 +39,9 @@ import ErrorBoundaryWrapper from "./components/ErrorBoundaryWrapper";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
-  const [bootstrapped, setBootstrapped] = useState(false); // ensures no redirect loop
+  const [bootstrapped, setBootstrapped] = useState(false);
 
-  // ⬇ Load authentication state from localStorage on app boot
+  // Load auth from localStorage
   useEffect(() => {
     try {
       const stored = localStorage.getItem("esgUser");
@@ -59,21 +59,19 @@ function App() {
     }
   }, []);
 
-  // ⬇ Save auth state to localStorage
   const handleLogin = (name) => {
     setUsername(name);
     setIsAuthenticated(true);
     localStorage.setItem("esgUser", JSON.stringify({ username: name }));
   };
 
-  // ⬇ Clear auth state on logout
   const handleLogout = () => {
     setUsername("");
     setIsAuthenticated(false);
     localStorage.removeItem("esgUser");
   };
 
-  // ⬇ Avoid rendering routes until auth state is restored
+  // Delay render until auth restored
   if (!bootstrapped) {
     return <div>Loading...</div>;
   }
@@ -86,7 +84,7 @@ function App() {
         )}
 
         <Routes>
-          {/* Login */}
+          {/* LOGIN */}
           <Route
             path="/"
             element={
@@ -98,7 +96,7 @@ function App() {
             }
           />
 
-          {/* Dashboard */}
+          {/* DASHBOARD */}
           <Route
             path="/dashboard"
             element={
@@ -112,7 +110,7 @@ function App() {
             }
           />
 
-          {/* Insights */}
+          {/* INSIGHTS */}
           <Route
             path="/dashboard/esg"
             element={
@@ -126,7 +124,7 @@ function App() {
             }
           />
 
-          {/* Social */}
+          {/* SOCIAL */}
           <Route
             path="/dashboard/social"
             element={
@@ -140,7 +138,7 @@ function App() {
             }
           />
 
-          {/* Social subpages */}
+          {/* SOCIAL SUB-PAGES */}
           <Route
             path="/dashboard/social/*"
             element={
@@ -154,7 +152,7 @@ function App() {
             }
           />
 
-          {/* Governance */}
+          {/* GOVERNANCE */}
           <Route
             path="/dashboard/governance"
             element={
@@ -168,7 +166,7 @@ function App() {
             }
           />
 
-          {/* Governance subpages */}
+          {/* GOVERNANCE SUB-PAGES */}
           <Route
             path="/dashboard/governance/corporate"
             element={
@@ -181,6 +179,7 @@ function App() {
               )
             }
           />
+
           <Route
             path="/dashboard/governance/ethic"
             element={
@@ -193,6 +192,7 @@ function App() {
               )
             }
           />
+
           <Route
             path="/dashboard/governance/data"
             element={
@@ -205,6 +205,7 @@ function App() {
               )
             }
           />
+
           <Route
             path="/dashboard/governance/supply"
             element={
@@ -218,21 +219,23 @@ function App() {
             }
           />
 
-          {/* Environmental */}
+          {/* ENVIRONMENTAL — CHANGE HERE */}
           <Route
             path="/dashboard/environment"
             element={
               isAuthenticated ? (
-                <ErrorBoundaryWrapper>
-                  <EnvironmentalCategory />
-                </ErrorBoundaryWrapper>
+                // Redirect "Environmental" → CorporateGovernance
+                <Navigate
+                  to="/dashboard/governance/corporate"
+                  replace
+                />
               ) : (
                 <Navigate to="/" replace />
               )
             }
           />
 
-          {/* Environmental subpages */}
+          {/* ENVIRONMENTAL SUB-PAGES */}
           <Route
             path="/dashboard/environment/energy"
             element={
@@ -245,6 +248,7 @@ function App() {
               )
             }
           />
+
           <Route
             path="/dashboard/environment/carbon"
             element={
@@ -257,6 +261,7 @@ function App() {
               )
             }
           />
+
           <Route
             path="/dashboard/environment/water"
             element={
@@ -269,6 +274,7 @@ function App() {
               )
             }
           />
+
           <Route
             path="/dashboard/environment/waste"
             element={
@@ -281,6 +287,7 @@ function App() {
               )
             }
           />
+
           <Route
             path="/dashboard/environment/coal"
             element={
@@ -294,7 +301,7 @@ function App() {
             }
           />
 
-          {/* FALLBACK (catch-all) */}
+          {/* FALLBACK */}
           <Route
             path="*"
             element={
