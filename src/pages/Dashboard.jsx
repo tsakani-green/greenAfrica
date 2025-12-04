@@ -22,6 +22,8 @@ import {
   FaLeaf,
   FaWater,
   FaRecycle,
+  FaUpload,
+  FaImage,
 } from "react-icons/fa";
 import { jsPDF } from "jspdf";
 import { API_BASE_URL } from "../config/api";
@@ -855,15 +857,18 @@ export default function Dashboard() {
         if (isSecondLogo) {
           setSecondLogo(data.logo);
           localStorage.setItem("secondLogo", data.logo);
+          alert("Second logo uploaded successfully!");
         } else {
           setCompanyLogo(data.logo);
           localStorage.setItem("companyLogo", data.logo);
+          alert("Main logo uploaded successfully!");
         }
       } else {
-        console.warn(data.detail || "Failed to extract logo from file");
+        alert(data.detail || "Failed to extract logo from file");
       }
     } catch (error) {
       console.error("Error uploading logo:", error);
+      alert("Failed to upload logo");
     } finally {
       if (isSecondLogo) {
         setSecondLogoLoading(false);
@@ -981,7 +986,7 @@ export default function Dashboard() {
         if (secondLogo) {
           try {
             const secondLogoData = secondLogo.replace(/^data:image\/\w+;base64,/, "");
-            doc.addImage(secondLogoData, "PNG", pageWidth - 44, 23, 30, 30);
+            doc.addImage(secondLogoData, "PNG", pageWidth - 54, 10, 40, 40);
           } catch (error) {
             console.warn("Failed to add second logo to PDF:", error);
           }
@@ -1219,22 +1224,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-lime-50 py-10 font-sans">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Hidden file inputs for logo uploads */}
-        <div style={{ display: 'none' }}>
-          <input
-            type="file"
-            id="logo-upload"
-            accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff,.webp"
-            onChange={(e) => handleLogoUpload(e, false)}
-          />
-          <input
-            type="file"
-            id="second-logo-upload"
-            accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff,.webp"
-            onChange={(e) => handleLogoUpload(e, true)}
-          />
-        </div>
-
         {/* Header Row */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -1242,67 +1231,65 @@ export default function Dashboard() {
               AfricaESG.AI Dashboard
             </h1>
             
-            {/* Company Name Display - HIDDEN */}
-            <div style={{ display: 'none' }}>
-              {isEditingCompany ? (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 p-3 bg-white rounded-lg border border-emerald-200 shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <FaBuilding className="text-gray-500" />
-                    <input
-                      type="text"
-                      value={tempCompanyName}
-                      onChange={(e) => setTempCompanyName(e.target.value)}
-                      className="px-3 py-1.5 border border-gray-300 rounded text-lg font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      placeholder="Enter company name"
-                      autoFocus
-                      style={{ minWidth: "250px" }}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleCompanyNameSave}
-                      className="px-3 py-1.5 bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm font-medium flex items-center gap-1"
-                      disabled={!tempCompanyName.trim()}
-                    >
-                      <FaCheck size={12} />
-                      Save
-                    </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      className="px-3 py-1.5 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm font-medium flex items-center gap-1"
-                    >
-                      <FaTimes size={12} />
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : companyName ? (
-                <div className="flex items-center gap-2 p-2 hover:bg-white/50 rounded-lg transition-colors">
+            {/* Company Name Display */}
+            {isEditingCompany ? (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 p-3 bg-white rounded-lg border border-emerald-200 shadow-sm mt-2">
+                <div className="flex items-center gap-2">
                   <FaBuilding className="text-gray-500" />
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-semibold text-gray-700">{companyName}</span>
-                    <button
-                      onClick={handleCompanyNameEdit}
-                      className="text-gray-400 hover:text-emerald-600 transition-colors"
-                      title="Edit company name"
-                    >
-                      <FaEdit size={14} />
-                    </button>
-                  </div>
+                  <input
+                    type="text"
+                    value={tempCompanyName}
+                    onChange={(e) => setTempCompanyName(e.target.value)}
+                    className="px-3 py-1.5 border border-gray-300 rounded text-lg font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Enter company name"
+                    autoFocus
+                    style={{ minWidth: "250px" }}
+                  />
                 </div>
-              ) : (
-                <div className="flex items-center gap-2 p-2">
-                  <FaBuilding className="text-gray-400" />
+                <div className="flex gap-2">
                   <button
-                    onClick={handleCompanyNameEdit}
-                    className="text-gray-500 hover:text-emerald-600 text-sm font-medium flex items-center gap-1"
+                    onClick={handleCompanyNameSave}
+                    className="px-3 py-1.5 bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm font-medium flex items-center gap-1"
+                    disabled={!tempCompanyName.trim()}
                   >
-                    <span>Set Company Name</span>
-                    <FaEdit size={12} />
+                    <FaCheck size={12} />
+                    Save
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    className="px-3 py-1.5 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm font-medium flex items-center gap-1"
+                  >
+                    <FaTimes size={12} />
+                    Cancel
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : companyName ? (
+              <div className="flex items-center gap-2 p-2 hover:bg-white/50 rounded-lg transition-colors mt-2">
+                <FaBuilding className="text-gray-500" />
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-semibold text-gray-700">{companyName}</span>
+                  <button
+                    onClick={handleCompanyNameEdit}
+                    className="text-gray-400 hover:text-emerald-600 transition-colors"
+                    title="Edit company name"
+                  >
+                    <FaEdit size={14} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 p-2 mt-2">
+                <FaBuilding className="text-gray-400" />
+                <button
+                  onClick={handleCompanyNameEdit}
+                  className="text-gray-500 hover:text-emerald-600 text-sm font-medium flex items-center gap-1"
+                >
+                  <span>Set Company Name</span>
+                  <FaEdit size={12} />
+                </button>
+              </div>
+            )}
             
             {/* Invoice Data Status */}
             {invoiceData && invoiceData.length > 0 && (
@@ -1333,16 +1320,157 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleGenerateReport}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-full shadow flex items-center gap-2 text-sm font-semibold"
-            >
-              <FaFilePdf />
-              Download ESG Report
-            </button>
+          {/* Logo Upload Section */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleGenerateReport}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-full shadow flex items-center gap-2 text-sm font-semibold"
+              >
+                <FaFilePdf />
+                Download ESG Report
+              </button>
+            </div>
           </div>
         </header>
+
+        {/* Logo Management Section - NOW VISIBLE */}
+        <section className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Company Logo Management
+          </h2>
+          <p className="text-sm text-gray-600 mb-6">
+            Upload logos that will appear in your ESG reports. Logos are not displayed in the dashboard but will appear in downloaded PDF reports.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Main Logo Upload */}
+            <div className="border border-gray-200 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-gray-700">Main Company Logo</h3>
+                <FaImage className="text-emerald-600" />
+              </div>
+              
+              <div className="mb-4">
+                {companyLogo ? (
+                  <div className="flex flex-col items-center">
+                    <img 
+                      src={companyLogo} 
+                      alt="Company Logo Preview" 
+                      className="h-24 w-auto max-w-full object-contain border border-gray-200 rounded-lg mb-3"
+                    />
+                    <p className="text-xs text-gray-500 text-center">
+                      Logo will appear in PDF reports
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-gray-300 rounded-lg mb-3">
+                    <FaImage className="text-gray-400 text-3xl mb-2" />
+                    <p className="text-sm text-gray-500">No logo uploaded</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  id="logo-upload"
+                  accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff,.webp"
+                  onChange={(e) => handleLogoUpload(e, false)}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="logo-upload"
+                  className="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-lg px-4 py-2.5 text-sm font-medium cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <FaUpload />
+                  {companyLogo ? "Change Main Logo" : "Upload Main Logo"}
+                </label>
+                {companyLogo && (
+                  <button
+                    onClick={() => {
+                      setCompanyLogo(null);
+                      localStorage.removeItem("companyLogo");
+                    }}
+                    className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 rounded-lg px-3 py-2.5 text-sm font-medium"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              {logoLoading && (
+                <p className="text-xs text-emerald-600 mt-2">Uploading logo...</p>
+              )}
+            </div>
+
+            {/* Secondary Logo Upload */}
+            <div className="border border-gray-200 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-gray-700">Secondary Logo (Optional)</h3>
+                <FaImage className="text-blue-600" />
+              </div>
+              
+              <div className="mb-4">
+                {secondLogo ? (
+                  <div className="flex flex-col items-center">
+                    <img 
+                      src={secondLogo} 
+                      alt="Secondary Logo Preview" 
+                      className="h-24 w-auto max-w-full object-contain border border-gray-200 rounded-lg mb-3"
+                    />
+                    <p className="text-xs text-gray-500 text-center">
+                      Appears alongside main logo in PDF
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-gray-300 rounded-lg mb-3">
+                    <FaImage className="text-gray-400 text-3xl mb-2" />
+                    <p className="text-sm text-gray-500">No secondary logo</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  id="second-logo-upload"
+                  accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff,.webp"
+                  onChange={(e) => handleLogoUpload(e, true)}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="second-logo-upload"
+                  className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-300 rounded-lg px-4 py-2.5 text-sm font-medium cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <FaUpload />
+                  {secondLogo ? "Change Secondary Logo" : "Upload Secondary Logo"}
+                </label>
+                {secondLogo && (
+                  <button
+                    onClick={() => {
+                      setSecondLogo(null);
+                      localStorage.removeItem("secondLogo");
+                    }}
+                    className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 rounded-lg px-3 py-2.5 text-sm font-medium"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              {secondLogoLoading && (
+                <p className="text-xs text-blue-600 mt-2">Uploading logo...</p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-6 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-xs text-gray-600">
+              <strong>Note:</strong> Logos are saved in your browser's local storage and will persist between sessions. 
+              Uploaded logos will appear in the "Download ESG Report" PDF but not in the dashboard UI.
+              Supported formats: PNG, JPG, JPEG, GIF, BMP, TIFF, WEBP, and PDF files containing images.
+            </p>
+          </div>
+        </section>
 
         {/* Invoice Data Summary Section */}
         {invoiceData && invoiceData.length > 0 && (
@@ -1472,14 +1600,12 @@ export default function Dashboard() {
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
                 ESG Performance Overview
               </h2>
-              <div style={{ display: 'none' }}>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-gray-700">
-                    Company: {companyName || "Company Name"}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    Report Period: {new Date().getFullYear()}
-                  </div>
+              <div className="text-right">
+                <div className="text-sm font-semibold text-gray-700">
+                  Company: {companyName || "Company Name"}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Report Period: {new Date().getFullYear()}
                 </div>
               </div>
             </div>
